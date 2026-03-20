@@ -4,6 +4,26 @@
 
 A lightweight FastAPI service with **embedded ChromaDB** that gives your app semantic search via simple REST endpoints. No separate vector DB container, no complex setup — just drop it in, point your service at it, and search.
 
+---
+
+## What Can You Build With This?
+
+This service acts as a **dedicated semantic search layer** that sits alongside your main application. Here are some real-world use cases:
+
+🔍 **AI-Powered Search** — replace keyword search in your app with meaning-based search. Users search for _"comfortable running shoes"_ and find relevant products even if the description says _"lightweight athletic footwear"_.
+
+🤖 **RAG (Retrieval-Augmented Generation)** — feed relevant context to your LLM before generating a response. Store your documents here, search by query, pass top results to GPT/Claude as context.
+
+📄 **Document Similarity** — find related articles, tickets, or records. _"Show me support tickets similar to this one"_ or _"find blog posts related to this topic"_.
+
+🛒 **Product Recommendations** — embed product descriptions and find semantically similar items. _"Customers who viewed this also liked..."_ without collaborative filtering.
+
+💬 **FAQ & Chatbot Matching** — match user questions to the closest FAQ entry or support article, even when the wording is completely different.
+
+🏷️ **Smart Tagging & Categorisation** — automatically classify incoming content by comparing it against category embeddings.
+
+---
+
 ![Swagger UI](./assets/swagger-ui.png)
 
 ## Architecture

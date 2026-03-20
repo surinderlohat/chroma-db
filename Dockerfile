@@ -2,7 +2,13 @@ FROM python:3.11-slim
 
 WORKDIR /service
 
-# ── Layer 1: torch (cached unless Dockerfile changes) ─────
+# Install gcc and build tools needed for psutil on linux/arm64
+# Cleaned up after install to keep image size small
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gcc python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# ── Layer 1: torch (cached unless this RUN command changes) ───
 # Installed first and separately so it gets its own cache layer.
 # This is the heaviest install (~200 MB) — only re-runs if this
 # RUN command itself changes.

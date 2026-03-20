@@ -1,6 +1,26 @@
 # ChromaDB Wrapper Service
 
+> **Plug-in vector search for any stack — one container, zero config, production ready.**
+
 A lightweight, production-ready **FastAPI wrapper** around embedded ChromaDB for semantic search and vector storage. Drop it into any stack via a single Docker container — no separate ChromaDB server needed.
+
+---
+
+## What Can You Build With This?
+
+This service acts as a **dedicated semantic search layer** that sits alongside your main application. Here are some real-world use cases:
+
+🔍 **AI-Powered Search** — replace keyword search in your app with meaning-based search. Users search for _"comfortable running shoes"_ and find relevant products even if the description says _"lightweight athletic footwear"_.
+
+🤖 **RAG (Retrieval-Augmented Generation)** — feed relevant context to your LLM before generating a response. Store your documents here, search by query, pass top results to GPT/Claude as context.
+
+📄 **Document Similarity** — find related articles, tickets, or records. _"Show me support tickets similar to this one"_ or _"find blog posts related to this topic"_.
+
+🛒 **Product Recommendations** — embed product descriptions and find semantically similar items. _"Customers who viewed this also liked..."_ without collaborative filtering.
+
+💬 **FAQ & Chatbot Matching** — match user questions to the closest FAQ entry or support article, even when the wording is completely different.
+
+🏷️ **Smart Tagging & Categorisation** — automatically classify incoming content by comparing it against category embeddings.
 
 ---
 
@@ -54,6 +74,7 @@ volumes:
 Full interactive docs at **`http://localhost:9000/docs`**
 
 ### Insert / Update — Single Document
+
 ```bash
 curl -X POST http://localhost:9000/documents/upsert \
   -H "Content-Type: application/json" \
@@ -66,6 +87,7 @@ curl -X POST http://localhost:9000/documents/upsert \
 ```
 
 ### Insert / Update — Bulk Documents
+
 ```bash
 curl -X POST http://localhost:9000/documents/upsert/bulk \
   -H "Content-Type: application/json" \
@@ -79,6 +101,7 @@ curl -X POST http://localhost:9000/documents/upsert/bulk \
 ```
 
 ### Semantic Search
+
 ```bash
 curl -X POST http://localhost:9000/search \
   -H "Content-Type: application/json" \
@@ -91,6 +114,7 @@ curl -X POST http://localhost:9000/search \
 ```
 
 ### Delete Documents
+
 ```bash
 curl -X DELETE http://localhost:9000/documents/delete \
   -H "Content-Type: application/json" \
@@ -98,6 +122,7 @@ curl -X DELETE http://localhost:9000/documents/delete \
 ```
 
 ### Collections
+
 ```
 GET    /collections           # list all
 GET    /collections/{name}    # get one
@@ -108,29 +133,29 @@ DELETE /collections/{name}    # drop one
 
 ## Environment Variables
 
-| Variable             | Default                  | Description                        |
-|----------------------|--------------------------|------------------------------------|
-| `CHROMA_PERSIST_DIR` | `/app/chromadb`          | Path where ChromaDB persists data  |
-| `EMBEDDING_MODEL`    | `BAAI/bge-small-en-v1.5` | SentenceTransformer model name     |
-| `DEFAULT_COLLECTION` | `default`                | Default collection name            |
+| Variable             | Default                  | Description                       |
+| -------------------- | ------------------------ | --------------------------------- |
+| `CHROMA_PERSIST_DIR` | `/app/chromadb`          | Path where ChromaDB persists data |
+| `EMBEDDING_MODEL`    | `BAAI/bge-small-en-v1.5` | SentenceTransformer model name    |
+| `DEFAULT_COLLECTION` | `default`                | Default collection name           |
 
 ---
 
 ## Capacity Guide
 
 | Records | RAM Required |
-|---------|-------------|
-| 100K    | ~1 GB       |
-| 500K    | ~4 GB       |
-| 1M      | ~8 GB       |
-| 2M      | ~16 GB      |
+| ------- | ------------ |
+| 100K    | ~1 GB        |
+| 500K    | ~4 GB        |
+| 1M      | ~8 GB        |
+| 2M      | ~16 GB       |
 
 ---
 
 ## Tags
 
 | Tag      | Description                   |
-|----------|-------------------------------|
+| -------- | ----------------------------- |
 | `latest` | Latest stable build from main |
 | `1.x.x`  | Specific release version      |
 
@@ -148,4 +173,3 @@ Created by **Surinder Singh** — [github.com/surinderlohat](https://github.com/
 
 Licensed under the [MIT License](https://github.com/surinderlohat/chroma-wrapper/blob/main/LICENSE).
 © 2025 Surinder Singh. All rights reserved.
-
