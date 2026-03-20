@@ -1,9 +1,9 @@
-# ── CPU-only torch — must be installed BEFORE sentence-transformers
-# Without this, pip pulls the default torch which includes CUDA (~2.5 GB)
-# CPU-only version is ~200 MB instead
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.3.0+cpu
-torchvision==0.18.0+cpu
+# ── CPU-only torch — installed via PyTorch's CPU index
+# Using --index-url ensures pip never pulls CUDA builds (~2.5 GB)
+# No version pin — pip picks the latest CPU build compatible with Python version
+--index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
 
 # ── Core dependencies
 fastapi==0.115.0
