@@ -13,8 +13,9 @@ from fastapi.responses import RedirectResponse
 
 from app.auth import verify_api_key
 from app.db import get_collection
+from app.log_buffer import attach_buffer_handler
 from app.logger import get_logger
-from app.routers import collections, documents, health, search
+from app.routers import admin, collections, documents, health, search
 
 logger = get_logger(__name__)
 
@@ -23,6 +24,7 @@ _API_KEY_SET = bool(os.getenv("API_KEY", ""))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    attach_buffer_handler()  # capture logs into in-memory buffer for admin dashboard
     logger.info("Initializing embedded ChromaDB...")
     get_collection()
     logger.info("ChromaDB ready (embedded mode).")
@@ -53,7 +55,6 @@ app.add_middleware(
 
 
 # ── Public endpoints ───────────────────────────────────────
-
 
 @app.get("/", include_in_schema=False)
 async def root():
@@ -105,8 +106,7 @@ async def openapi_schema():
 _auth = Depends(verify_api_key)
 
 app.include_router(health.router, tags=["Health"], dependencies=[_auth])
-app.include_router(
-    collections.router, prefix="/collections", tags=["Collections"], dependencies=[_auth]
-)
+app.include_router(collections.router, prefix="/collections", tags=["Collections"], dependencies=[_auth])
 app.include_router(documents.router, prefix="/documents", tags=["Documents"], dependencies=[_auth])
 app.include_router(search.router, prefix="/search", tags=["Search"], dependencies=[_auth])
+app.include_router(admin.router, prefix="/admin", include_in_schema=False)

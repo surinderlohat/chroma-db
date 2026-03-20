@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SearchKit — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0a0a0f;
+  --surface:   #12121a;
+  --surface2:  #16161f;
+  --border:    #1e1e2e;
+  --accent:    #6ee7b7;
+  --accent2:   #818cf8;
+  --accent3:   #fb923c;
+  --text:      #e2e8f0;
+  --muted:     #64748b;
+  --danger:    #f87171;
+  --success:   #4ade80;
+  --warning:   #fbbf24;
+  --mono:      'DM Mono', monospace;
+  --display:   'Syne', sans-serif;
+  --sidebar-w: 220px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  display: flex;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgba(110,231,183,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 100%, rgba(129,140,248,0.04) 0%, transparent 50%);
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+}
+
+.logo {
+  font-family: var(--display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+.logo span { color: var(--accent); }
+.logo-sub { color: var(--muted); font-size: 0.7rem; margin-bottom: 2rem; }
+
+nav { flex: 1; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.82rem;
+  transition: all 0.15s;
+  margin-bottom: 0.25rem;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--mono);
+}
+.nav-item:hover { color: var(--text); background: var(--border); }
+.nav-item.active { color: var(--accent); background: rgba(110,231,183,0.08); }
+.nav-icon { font-size: 1rem; }
+
+.sidebar-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: color 0.15s;
+  font-family: var(--mono);
+}
+.logout-btn:hover { color: var(--danger); }
+
+/* ── Main ── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  padding: 2rem;
+  max-width: calc(100vw - var(--sidebar-w));
+}
+
+.page { display: none; }
+.page.active { display: block; }
+
+.page-title {
+  font-family: var(--display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+}
+.page-title span { color: var(--accent); }
+
+/* ── Cards ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.card-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+/* ── Stats grid ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+}
+.stat-card:nth-child(2)::before { background: var(--accent2); }
+.stat-card:nth-child(3)::before { background: var(--accent3); }
+
+.stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.stat-value { font-family: var(--display); font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; }
+.stat-sub { font-size: 0.72rem; color: var(--muted); margin-top: 0.25rem; }
+
+/* Memory bar */
+.mem-bar-wrap { background: var(--border); border-radius: 4px; height: 6px; margin-top: 0.5rem; overflow: hidden; }
+.mem-bar { height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.5s ease; }
+.mem-bar.warn { background: var(--warning); }
+.mem-bar.crit { background: var(--danger); }
+
+/* Collections table */
+.table { width: 100%; border-collapse: collapse; }
+.table th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); }
+.table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid rgba(30,30,46,0.5); font-size: 0.83rem; }
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  background: rgba(110,231,183,0.12);
+  color: var(--accent);
+}
+
+/* ── Forms ── */
+.form-row { display: flex; gap: 0.75rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+.form-group { flex: 1; min-width: 160px; }
+.form-group label { display: block; font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.4rem; }
+
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+textarea { resize: vertical; min-height: 80px; }
+
+.btn {
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  border: none;
+  font-family: var(--display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  letter-spacing: 0.01em;
+}
+.btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--accent); color: #0a0a0f; }
+.btn-danger  { background: rgba(248,113,113,0.15); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
+.btn-sm { padding: 0.3rem 0.7rem; font-size: 0.75rem; }
+
+/* ── Search results ── */
+.result-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.6rem;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+.result-id { color: var(--accent2); font-size: 0.78rem; }
+.result-score { font-size: 0.72rem; color: var(--muted); }
+.result-text { color: var(--text); line-height: 1.5; margin-bottom: 0.4rem; }
+.result-meta { font-size: 0.72rem; color: var(--muted); font-style: italic; }
+
+/* ── Logs ── */
+.log-wrap {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  height: 420px;
+  overflow-y: auto;
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+.log-line { display: flex; gap: 0.75rem; padding: 0.15rem 0; border-bottom: 1px solid rgba(30,30,46,0.4); }
+.log-line:last-child { border-bottom: none; }
+.log-ts  { color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+.log-lvl { width: 60px; flex-shrink: 0; font-weight: 500; }
+.log-lvl.DEBUG    { color: var(--muted); }
+.log-lvl.INFO     { color: var(--accent); }
+.log-lvl.WARNING  { color: var(--warning); }
+.log-lvl.ERROR    { color: var(--danger); }
+.log-lvl.CRITICAL { color: var(--danger); font-weight: 700; }
+.log-name { color: var(--accent2); flex-shrink: 0; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log-msg  { color: var(--text); flex: 1; word-break: break-word; }
+
+.log-controls { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.75rem; }
+.log-filter { display: flex; gap: 0.4rem; }
+.filter-btn {
+  padding: 0.25rem 0.6rem;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(110,231,183,0.08); }
+.auto-refresh { display: flex; align-items: center; gap: 0.4rem; color: var(--muted); font-size: 0.75rem; margin-left: auto; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* ── Doc browser ── */
+.doc-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.doc-body { flex: 1; overflow: hidden; }
+.doc-id   { color: var(--accent2); font-size: 0.75rem; margin-bottom: 0.3rem; }
+.doc-text { color: var(--text); line-height: 1.5; font-size: 0.83rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.doc-meta { color: var(--muted); font-size: 0.72rem; margin-top: 0.25rem; font-style: italic; }
+
+/* ── Empty / loading states ── */
+.empty { color: var(--muted); font-size: 0.82rem; text-align: center; padding: 2rem; }
+.loading { color: var(--muted); font-size: 0.82rem; padding: 0.5rem 0; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  animation: slideUp 0.3s ease;
+  z-index: 1000;
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.toast.success { background: rgba(74,222,128,0.15); border: 1px solid rgba(74,222,128,0.3); color: var(--success); }
+.toast.error   { background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3); color: var(--danger); }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="logo">Search<span>Kit</span></div>
+  <div class="logo-sub">Admin Dashboard</div>
+  <nav>
+    <button class="nav-item active" onclick="showPage('stats')">
+      <span class="nav-icon">◈</span> Overview
+    </button>
+    <button class="nav-item" onclick="showPage('search')">
+      <span class="nav-icon">⌕</span> Search
+    </button>
+    <button class="nav-item" onclick="showPage('docs')">
+      <span class="nav-icon">≡</span> Documents
+    </button>
+    <button class="nav-item" onclick="showPage('logs')">
+      <span class="nav-icon">▸</span> Live Logs
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="/admin/logout" class="logout-btn">↩ Sign out</a>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- ── Overview ── -->
+  <div id="page-stats" class="page active">
+    <div class="page-title">Overview <span>·</span> System Health</div>
+
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Collections</div>
+        <div class="stat-value" id="stat-collections">—</div>
+        <div class="stat-sub">total collections</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Documents</div>
+        <div class="stat-value" id="stat-docs">—</div>
+        <div class="stat-sub">across all collections</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">RAM Usage</div>
+        <div class="stat-value" id="stat-mem">—</div>
+        <div class="stat-sub" id="stat-mem-sub">of limit</div>
+        <div class="mem-bar-wrap"><div class="mem-bar" id="mem-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Collections</div>
+      <table class="table">
+        <thead>
+          <tr><th>Name</th><th>Documents</th><th>Status</th></tr>
+        </thead>
+        <tbody id="collections-table">
+          <tr><td colspan="3" class="empty">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Search ── -->
+  <div id="page-search" class="page">
+    <div class="page-title">Search <span>·</span> Test Queries</div>
+    <div class="card">
+      <div class="form-row">
+        <div class="form-group" style="flex:3">
+          <label>Query</label>
+          <input type="text" id="search-query" placeholder="Enter your search query…" onkeydown="if(event.key==='Enter') runSearch()">
+        </div>
+        <div class="form-group" style="flex:1; min-width:120px">
+          <label>Collection</label>
+          <select id="search-collection"></select>
+        </div>
+        <div class="form-group" style="flex:0; min-width:80px">
+          <label>Top K</label>
+          <input type="number" id="search-topk" value="10" min="1" max="100">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="runSearch()">Search →</button>
+    </div>
+    <div id="search-results"></div>
+  </div>
+
+  <!-- ── Documents ── -->
+  <div id="page-docs" class="page">
+    <div class="page-title">Documents <span>·</span> Browser</div>
+    <div class="card">
+      <div class="card-title">Browse</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Collection</label>
+          <select id="docs-collection" onchange="loadDocs()"></select>
+        </div>
+        <div class="form-group" style="flex:0; min-width:100px">
+          <label>Limit</label>
+          <input type="number" id="docs-limit" value="50" min="1" max="500" onchange="loadDocs()">
+        </div>
+        <div class="form-group" style="flex:0; display:flex; align-items:flex-end;">
+          <button class="btn btn-primary" onclick="loadDocs()">Load</button>
+        </div>
+      </div>
+      <div id="docs-list"><div class="empty">Select a collection and click Load.</div></div>
+    </div>
+  </div>
+
+  <!-- ── Logs ── -->
+  <div id="page-logs" class="page">
+    <div class="page-title">Live Logs <span>·</span> Last 200 lines</div>
+    <div class="card">
+      <div class="log-controls">
+        <div class="log-filter">
+          <button class="filter-btn active" onclick="setFilter('ALL', this)">ALL</button>
+          <button class="filter-btn" onclick="setFilter('INFO', this)">INFO</button>
+          <button class="filter-btn" onclick="setFilter('WARNING', this)">WARN</button>
+          <button class="filter-btn" onclick="setFilter('ERROR', this)">ERROR</button>
+          <button class="filter-btn" onclick="setFilter('DEBUG', this)">DEBUG</button>
+        </div>
+        <div class="auto-refresh"><div class="dot"></div> Auto-refresh 3s</div>
+      </div>
+      <div class="log-wrap" id="log-wrap"></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── State ──────────────────────────────────────────────────
+let currentPage   = 'stats';
+let logFilter     = 'ALL';
+let collections   = [];
+let statsInterval = null;
+let logsInterval  = null;
+
+// ── Navigation ─────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item')[['stats','search','docs','logs'].indexOf(name)].classList.add('active');
+  currentPage = name;
+  if (name === 'logs')  startLogsRefresh();
+  else                  stopLogsRefresh();
+}
+
+// ── Toast ──────────────────────────────────────────────────
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+// ── API helpers ────────────────────────────────────────────
+async function api(path, opts = {}) {
+  const res = await fetch('/admin' + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts,
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+// ── Stats ──────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const data = await api('/api/stats');
+    collections = data.collections;
+
+    // Update stat cards
+    document.getElementById('stat-collections').textContent = data.collections.length;
+    const totalDocs = data.collections.reduce((s, c) => s + c.count, 0);
+    document.getElementById('stat-docs').textContent = totalDocs.toLocaleString();
+    document.getElementById('stat-mem').textContent  = data.memory_mb + ' MB';
+    document.getElementById('stat-mem-sub').textContent = `of ${data.memory_limit_mb} MB limit`;
+
+    // Memory bar
+    const pct  = Math.min((data.memory_mb / data.memory_limit_mb) * 100, 100);
+    const bar  = document.getElementById('mem-bar');
+    bar.style.width = pct + '%';
+    bar.className   = 'mem-bar' + (pct >= 90 ? ' crit' : pct >= 75 ? ' warn' : '');
+
+    // Collections table
+    const tbody = document.getElementById('collections-table');
+    if (data.collections.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" class="empty">No collections yet.</td></tr>';
+    } else {
+      tbody.innerHTML = data.collections.map(c => `
+        <tr>
+          <td>${c.name}</td>
+          <td><span class="badge">${c.count.toLocaleString()} docs</span></td>
+          <td><span style="color:var(--success);font-size:0.75rem;">● active</span></td>
+        </tr>
+      `).join('');
+    }
+
+    // Populate collection selects
+    populateCollectionSelects(data.collections.map(c => c.name));
+  } catch (e) {
+    console.error('Stats error:', e);
+  }
+}
+
+function populateCollectionSelects(names) {
+  ['search-collection', 'docs-collection'].forEach(id => {
+    const sel = document.getElementById(id);
+    const cur = sel.value;
+    sel.innerHTML = names.map(n => `<option value="${n}">${n}</option>`).join('');
+    if (cur && names.includes(cur)) sel.value = cur;
+  });
+}
+
+// ── Search ─────────────────────────────────────────────────
+async function runSearch() {
+  const query      = document.getElementById('search-query').value.trim();
+  const collection = document.getElementById('search-collection').value;
+  const top_k      = parseInt(document.getElementById('search-topk').value);
+  const container  = document.getElementById('search-results');
+
+  if (!query) return;
+  container.innerHTML = '<div class="loading">Searching…</div>';
+
+  try {
+    const data = await api('/api/search', {
+      method: 'POST',
+      body: JSON.stringify({ query, collection, top_k }),
+    });
+
+    if (!data.results.length) {
+      container.innerHTML = '<div class="empty">No results found.</div>';
+      return;
+    }
+
+    container.innerHTML = data.results.map((r, i) => `
+      <div class="result-item">
+        <div class="result-header">
+          <span class="result-id"># ${r.id}</span>
+          <span class="result-score">distance: ${r.distance}</span>
+        </div>
+        <div class="result-text">${escHtml(r.text)}</div>
+        <div class="result-meta">${Object.keys(r.metadata).length ? JSON.stringify(r.metadata) : 'no metadata'}</div>
+      </div>
+    `).join('');
+  } catch (e) {
+    container.innerHTML = `<div class="empty" style="color:var(--danger)">Error: ${e.message}</div>`;
+  }
+}
+
+// ── Documents ──────────────────────────────────────────────
+async function loadDocs() {
+  const collection = document.getElementById('docs-collection').value;
+  const limit      = document.getElementById('docs-limit').value;
+  const container  = document.getElementById('docs-list');
+  if (!collection) return;
+
+  container.innerHTML = '<div class="loading">Loading documents…</div>';
+  try {
+    const data = await api(`/api/documents?collection=${collection}&limit=${limit}`);
+
+    if (!data.documents.length) {
+      container.innerHTML = '<div class="empty">No documents in this collection.</div>';
+      return;
+    }
+
+    container.innerHTML = `<div style="color:var(--muted);font-size:0.75rem;margin-bottom:0.75rem;">
+      Showing ${data.documents.length} of ${data.total.toLocaleString()} documents
+    </div>` + data.documents.map(d => `
+      <div class="doc-item" id="doc-${d.id}">
+        <div class="doc-body">
+          <div class="doc-id">${escHtml(d.id)}</div>
+          <div class="doc-text">${escHtml(d.text)}</div>
+          <div class="doc-meta">${Object.keys(d.metadata).length ? JSON.stringify(d.metadata) : 'no metadata'}</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="deleteDoc('${escAttr(d.id)}', '${escAttr(collection)}')">Delete</button>
+      </div>
+    `).join('');
+  } catch (e) {
+    container.innerHTML = `<div class="empty" style="color:var(--danger)">Error: ${e.message}</div>`;
+  }
+}
+
+async function deleteDoc(id, collection) {
+  if (!confirm(`Delete document "${id}"?`)) return;
+  try {
+    await api(`/api/documents/${encodeURIComponent(id)}?collection=${collection}`, { method: 'DELETE' });
+    document.getElementById('doc-' + id)?.remove();
+    toast(`Deleted "${id}"`);
+    loadStats();
+  } catch (e) {
+    toast(`Failed: ${e.message}`, 'error');
+  }
+}
+
+// ── Logs ───────────────────────────────────────────────────
+function setFilter(level, btn) {
+  logFilter = level;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLogs(window._lastLogs || []);
+}
+
+async function fetchLogs() {
+  try {
+    const data = await api('/api/logs');
+    window._lastLogs = data.logs;
+    renderLogs(data.logs);
+  } catch (e) { /* silent */ }
+}
+
+function renderLogs(logs) {
+  const filtered = logFilter === 'ALL' ? logs : logs.filter(l => l.level === logFilter);
+  const wrap = document.getElementById('log-wrap');
+  if (!filtered.length) {
+    wrap.innerHTML = '<div class="empty">No log entries.</div>';
+    return;
+  }
+  wrap.innerHTML = filtered.map(l => `
+    <div class="log-line">
+      <span class="log-ts">${l.ts}</span>
+      <span class="log-lvl ${l.level}">${l.level}</span>
+      <span class="log-name" title="${escHtml(l.logger)}">${escHtml(l.logger.split('.').pop())}</span>
+      <span class="log-msg">${escHtml(l.msg)}</span>
+    </div>
+  `).join('');
+}
+
+function startLogsRefresh() {
+  fetchLogs();
+  logsInterval = setInterval(fetchLogs, 3000);
+}
+
+function stopLogsRefresh() {
+  clearInterval(logsInterval);
+  logsInterval = null;
+}
+
+// ── Utils ──────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) { return String(s).replace(/'/g,"\\'"); }
+
+// ── Init ───────────────────────────────────────────────────
+loadStats();
+statsInterval = setInterval(loadStats, 10000);
+</script>
+</body>
+</html>
