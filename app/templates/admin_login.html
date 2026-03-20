@@ -1,165 +1,46 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SearchKit — Admin</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
 
-      :root {
-        --bg: #0a0a0f;
-        --surface: #12121a;
-        --border: #1e1e2e;
-        --accent: #6ee7b7;
-        --accent2: #818cf8;
-        --text: #e2e8f0;
-        --muted: #64748b;
-        --danger: #f87171;
-        --mono: "DM Mono", monospace;
-        --display: "Syne", sans-serif;
-      }
+{% block body %}
+<div class="min-h-screen flex items-center justify-center bg-[radial-gradient(ellipse_at_20%_50%,rgba(110,231,183,0.05)_0%,transparent_60%),radial-gradient(ellipse_at_80%_20%,rgba(129,140,248,0.05)_0%,transparent_60%)]">
+  <div class="w-full max-w-md bg-surface border border-border rounded-2xl p-10 shadow-[0_0_60px_rgba(110,231,183,0.05)]">
 
-      body {
-        background: var(--bg);
-        color: var(--text);
-        font-family: var(--mono);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-image:
-          radial-gradient(
-            ellipse at 20% 50%,
-            rgba(110, 231, 183, 0.05) 0%,
-            transparent 60%
-          ),
-          radial-gradient(
-            ellipse at 80% 20%,
-            rgba(129, 140, 248, 0.05) 0%,
-            transparent 60%
-          );
-      }
+    <!-- Logo -->
+    <h1 class="font-display text-2xl font-extrabold tracking-tight mb-1">
+      Search<span class="text-brand">Kit</span>
+    </h1>
+    <p class="text-slate-500 text-xs mb-8">Admin Dashboard — Restricted Access</p>
 
-      .login-card {
-        width: 100%;
-        max-width: 420px;
-        padding: 2.5rem;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        box-shadow: 0 0 60px rgba(110, 231, 183, 0.05);
-      }
+    <!-- Error -->
+    {% if error %}
+    <div class="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm mb-5">
+      ⚠ {{ error }}
+    </div>
+    {% endif %}
 
-      .logo {
-        font-family: var(--display);
-        font-size: 1.6rem;
-        font-weight: 800;
-        letter-spacing: -0.02em;
-        margin-bottom: 0.3rem;
-      }
-
-      .logo span {
-        color: var(--accent);
-      }
-
-      .subtitle {
-        color: var(--muted);
-        font-size: 0.8rem;
-        margin-bottom: 2rem;
-      }
-
-      label {
-        display: block;
-        font-size: 0.75rem;
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        margin-bottom: 0.5rem;
-      }
-
-      input[type="password"] {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        color: var(--text);
-        font-family: var(--mono);
-        font-size: 0.9rem;
-        outline: none;
-        transition: border-color 0.2s;
-        margin-bottom: 1.25rem;
-      }
-
-      input[type="password"]:focus {
-        border-color: var(--accent);
-      }
-
-      button {
-        width: 100%;
-        padding: 0.8rem;
-        background: var(--accent);
-        color: #0a0a0f;
-        border: none;
-        border-radius: 8px;
-        font-family: var(--display);
-        font-size: 0.95rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition:
-          opacity 0.2s,
-          transform 0.1s;
-        letter-spacing: 0.02em;
-      }
-
-      button:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
-      }
-      button:active {
-        transform: translateY(0);
-      }
-
-      .error {
-        background: rgba(248, 113, 113, 0.1);
-        border: 1px solid rgba(248, 113, 113, 0.3);
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        color: var(--danger);
-        font-size: 0.82rem;
-        margin-bottom: 1.25rem;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="login-card">
-      <div class="logo">Search<span>Kit</span></div>
-      <div class="subtitle">Admin Dashboard — Restricted Access</div>
-      {% if error %}
-      <div class="error">⚠ {{ error }}</div>
-      {% endif %}
-      <form method="POST" action="/admin/login">
-        <label for="password">Admin Password</label>
+    <!-- Form -->
+    <form method="POST" action="/admin/login" class="space-y-5">
+      <div>
+        <label for="password" class="block text-xs text-slate-500 uppercase tracking-widest mb-1.5">
+          Admin Password
+        </label>
         <input
           type="password"
           id="password"
           name="password"
           placeholder="Enter password"
           autofocus
-        />
-        <button type="submit">Sign In →</button>
-      </form>
-    </div>
-  </body>
-</html>
+          class="w-full bg-[#0a0a0f] border border-border rounded-lg px-4 py-2.5 text-slate-200 text-sm font-mono outline-none focus:border-brand transition-colors"
+        >
+      </div>
+      <button
+        type="submit"
+        class="w-full bg-brand text-[#0a0a0f] font-display font-bold text-base rounded-lg py-3 hover:opacity-90 active:scale-[.99] transition-all"
+      >
+        Sign In →
+      </button>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

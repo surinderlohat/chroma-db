@@ -1,675 +1,674 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SearchKit — Admin Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+{% extends "base.html" %} {% block title %}Dashboard{% endblock %} {% block body
+%}
+<div class="flex min-h-screen">
+  <!-- ── Sidebar ── -->
+  <aside
+    class="w-56 min-h-screen bg-surface border-r border-border flex flex-col px-4 py-6 fixed top-0 left-0 bottom-0 z-10"
+  >
+    <h1 class="font-display text-xl font-extrabold tracking-tight mb-0.5">
+      Search<span class="text-brand">Kit</span>
+    </h1>
+    <p class="text-slate-500 text-[11px] mb-8">Admin Dashboard</p>
+    <nav class="flex-1 space-y-1">
+      <button onclick="showPage('stats')" class="nav-item active">
+        ◈ Overview
+      </button>
+      <button onclick="showPage('search')" class="nav-item">⌕ Search</button>
+      <button onclick="showPage('docs')" class="nav-item">≡ Documents</button>
+      <button onclick="showPage('collections')" class="nav-item">
+        ⊞ Collections
+      </button>
+      <button onclick="showPage('import')" class="nav-item">
+        ⇑ CSV Import
+      </button>
+      <button onclick="showPage('logs')" class="nav-item">▸ Live Logs</button>
+    </nav>
+    <div class="border-t border-border pt-4 space-y-2">
+      <div>
+        <p
+          class="text-[10px] text-slate-600 uppercase tracking-widest px-3 mb-1"
+        >
+          API Key
+        </p>
+        <input
+          type="password"
+          id="api-key-input"
+          placeholder="X-API-Key"
+          class="w-full bg-[#0a0a0f] border border-border rounded px-2 py-1.5 text-xs font-mono text-slate-400 outline-none focus:border-brand"
+          onchange="saveApiKey(this.value)"
+        />
+      </div>
+      <a
+        href="/admin/logout"
+        class="flex items-center gap-2 px-3 py-2 text-slate-500 hover:text-red-400 text-xs rounded-lg transition-colors font-mono"
+        >↩ Sign out</a
+      >
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="ml-56 flex-1 p-8">
+    {% include "partials/page_overview.html" %} {% include
+    "partials/page_search.html" %} {% include "partials/page_documents.html" %}
+    {% include "partials/page_collections.html" %} {% include
+    "partials/page_import.html" %} {% include "partials/page_logs.html" %}
+  </main>
+</div>
+{% endblock %} {% block scripts %}
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg:        #0a0a0f;
-  --surface:   #12121a;
-  --surface2:  #16161f;
-  --border:    #1e1e2e;
-  --accent:    #6ee7b7;
-  --accent2:   #818cf8;
-  --accent3:   #fb923c;
-  --text:      #e2e8f0;
-  --muted:     #64748b;
-  --danger:    #f87171;
-  --success:   #4ade80;
-  --warning:   #fbbf24;
-  --mono:      'DM Mono', monospace;
-  --display:   'Syne', sans-serif;
-  --sidebar-w: 220px;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 0.875rem;
-  display: flex;
-  min-height: 100vh;
-  background-image:
-    radial-gradient(ellipse at 0% 0%, rgba(110,231,183,0.04) 0%, transparent 50%),
-    radial-gradient(ellipse at 100% 100%, rgba(129,140,248,0.04) 0%, transparent 50%);
-}
-
-/* ── Sidebar ── */
-.sidebar {
-  width: var(--sidebar-w);
-  min-height: 100vh;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  padding: 1.5rem 1rem;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-}
-
-.logo {
-  font-family: var(--display);
-  font-size: 1.3rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.25rem;
-}
-.logo span { color: var(--accent); }
-.logo-sub { color: var(--muted); font-size: 0.7rem; margin-bottom: 2rem; }
-
-nav { flex: 1; }
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.55rem 0.75rem;
-  border-radius: 8px;
-  cursor: pointer;
-  color: var(--muted);
-  font-size: 0.82rem;
-  transition: all 0.15s;
-  margin-bottom: 0.25rem;
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-  font-family: var(--mono);
-}
-.nav-item:hover { color: var(--text); background: var(--border); }
-.nav-item.active { color: var(--accent); background: rgba(110,231,183,0.08); }
-.nav-icon { font-size: 1rem; }
-
-.sidebar-footer {
-  border-top: 1px solid var(--border);
-  padding-top: 1rem;
-}
-.logout-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  color: var(--muted);
-  font-size: 0.78rem;
-  text-decoration: none;
-  border-radius: 6px;
-  transition: color 0.15s;
-  font-family: var(--mono);
-}
-.logout-btn:hover { color: var(--danger); }
-
-/* ── Main ── */
-.main {
-  margin-left: var(--sidebar-w);
-  flex: 1;
-  padding: 2rem;
-  max-width: calc(100vw - var(--sidebar-w));
-}
-
-.page { display: none; }
-.page.active { display: block; }
-
-.page-title {
-  font-family: var(--display);
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  letter-spacing: -0.02em;
-}
-.page-title span { color: var(--accent); }
-
-/* ── Cards ── */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.25rem;
-}
-.card-title {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  margin-bottom: 1rem;
-}
-
-/* ── Stats grid ── */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-}
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.25rem;
-  position: relative;
-  overflow: hidden;
-}
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--accent);
-}
-.stat-card:nth-child(2)::before { background: var(--accent2); }
-.stat-card:nth-child(3)::before { background: var(--accent3); }
-
-.stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
-.stat-value { font-family: var(--display); font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; }
-.stat-sub { font-size: 0.72rem; color: var(--muted); margin-top: 0.25rem; }
-
-/* Memory bar */
-.mem-bar-wrap { background: var(--border); border-radius: 4px; height: 6px; margin-top: 0.5rem; overflow: hidden; }
-.mem-bar { height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.5s ease; }
-.mem-bar.warn { background: var(--warning); }
-.mem-bar.crit { background: var(--danger); }
-
-/* Collections table */
-.table { width: 100%; border-collapse: collapse; }
-.table th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); }
-.table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid rgba(30,30,46,0.5); font-size: 0.83rem; }
-.table tr:last-child td { border-bottom: none; }
-.table tr:hover td { background: rgba(255,255,255,0.02); }
-
-/* Badge */
-.badge {
-  display: inline-block;
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.72rem;
-  background: rgba(110,231,183,0.12);
-  color: var(--accent);
-}
-
-/* ── Forms ── */
-.form-row { display: flex; gap: 0.75rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
-.form-group { flex: 1; min-width: 160px; }
-.form-group label { display: block; font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.4rem; }
-
-input[type="text"], input[type="number"], select, textarea {
-  width: 100%;
-  padding: 0.6rem 0.75rem;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 0.85rem;
-  outline: none;
-  transition: border-color 0.15s;
-}
-input:focus, select:focus, textarea:focus { border-color: var(--accent); }
-textarea { resize: vertical; min-height: 80px; }
-
-.btn {
-  padding: 0.55rem 1.25rem;
-  border-radius: 8px;
-  border: none;
-  font-family: var(--display);
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
-  letter-spacing: 0.01em;
-}
-.btn:hover { opacity: 0.85; transform: translateY(-1px); }
-.btn:active { transform: translateY(0); }
-.btn-primary { background: var(--accent); color: #0a0a0f; }
-.btn-danger  { background: rgba(248,113,113,0.15); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
-.btn-sm { padding: 0.3rem 0.7rem; font-size: 0.75rem; }
-
-/* ── Search results ── */
-.result-item {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.9rem 1rem;
-  margin-bottom: 0.6rem;
-  animation: fadeIn 0.2s ease;
-}
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-.result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
-.result-id { color: var(--accent2); font-size: 0.78rem; }
-.result-score { font-size: 0.72rem; color: var(--muted); }
-.result-text { color: var(--text); line-height: 1.5; margin-bottom: 0.4rem; }
-.result-meta { font-size: 0.72rem; color: var(--muted); font-style: italic; }
-
-/* ── Logs ── */
-.log-wrap {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1rem;
-  height: 420px;
-  overflow-y: auto;
-  font-size: 0.78rem;
-  line-height: 1.6;
-}
-.log-line { display: flex; gap: 0.75rem; padding: 0.15rem 0; border-bottom: 1px solid rgba(30,30,46,0.4); }
-.log-line:last-child { border-bottom: none; }
-.log-ts  { color: var(--muted); white-space: nowrap; flex-shrink: 0; }
-.log-lvl { width: 60px; flex-shrink: 0; font-weight: 500; }
-.log-lvl.DEBUG    { color: var(--muted); }
-.log-lvl.INFO     { color: var(--accent); }
-.log-lvl.WARNING  { color: var(--warning); }
-.log-lvl.ERROR    { color: var(--danger); }
-.log-lvl.CRITICAL { color: var(--danger); font-weight: 700; }
-.log-name { color: var(--accent2); flex-shrink: 0; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.log-msg  { color: var(--text); flex: 1; word-break: break-word; }
-
-.log-controls { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.75rem; }
-.log-filter { display: flex; gap: 0.4rem; }
-.filter-btn {
-  padding: 0.25rem 0.6rem;
-  border-radius: 5px;
-  border: 1px solid var(--border);
-  background: none;
-  color: var(--muted);
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(110,231,183,0.08); }
-.auto-refresh { display: flex; align-items: center; gap: 0.4rem; color: var(--muted); font-size: 0.75rem; margin-left: auto; }
-.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-/* ── Doc browser ── */
-.doc-item {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.85rem 1rem;
-  margin-bottom: 0.5rem;
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-}
-.doc-body { flex: 1; overflow: hidden; }
-.doc-id   { color: var(--accent2); font-size: 0.75rem; margin-bottom: 0.3rem; }
-.doc-text { color: var(--text); line-height: 1.5; font-size: 0.83rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.doc-meta { color: var(--muted); font-size: 0.72rem; margin-top: 0.25rem; font-style: italic; }
-
-/* ── Empty / loading states ── */
-.empty { color: var(--muted); font-size: 0.82rem; text-align: center; padding: 2rem; }
-.loading { color: var(--muted); font-size: 0.82rem; padding: 0.5rem 0; }
-
-/* ── Toast ── */
-.toast {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  padding: 0.7rem 1.2rem;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  animation: slideUp 0.3s ease;
-  z-index: 1000;
-}
-@keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.toast.success { background: rgba(74,222,128,0.15); border: 1px solid rgba(74,222,128,0.3); color: var(--success); }
-.toast.error   { background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3); color: var(--danger); }
+  .nav-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.82rem;
+    font-family: "DM Mono", monospace;
+    color: #64748b;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+  }
+  .nav-item:hover {
+    color: #e2e8f0;
+    background: #1e1e2e;
+  }
+  .nav-item.active {
+    color: #6ee7b7;
+    background: rgba(110, 231, 183, 0.08);
+  }
+  .page {
+    display: block;
+  }
+  .page.hidden {
+    display: none;
+  }
+  .stat-card {
+    background: #12121a;
+    border: 1px solid #1e1e2e;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+  }
+  .th {
+    text-align: left;
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.5rem 0.5rem 0.75rem;
+  }
+  .lbl {
+    display: block;
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.375rem;
+  }
+  .inp {
+    width: 100%;
+    background: #0a0a0f;
+    border: 1px solid #1e1e2e;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    color: #e2e8f0;
+    font-family: "DM Mono", monospace;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .inp:focus {
+    border-color: #6ee7b7;
+  }
+  textarea.inp {
+    resize: vertical;
+  }
+  .btn-primary {
+    background: #6ee7b7;
+    color: #0a0a0f;
+    font-family: "Syne", sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:hover {
+    opacity: 0.85;
+  }
+  .filter-btn {
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.3rem;
+    border: 1px solid #1e1e2e;
+    background: none;
+    color: #64748b;
+    font-family: "DM Mono", monospace;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-btn.active {
+    border-color: #6ee7b7;
+    color: #6ee7b7;
+    background: rgba(110, 231, 183, 0.08);
+  }
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.4rem;
+    border: 1px solid #1e1e2e;
+    cursor: pointer;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    transition: all 0.15s;
+  }
+  .checkbox-label:hover {
+    border-color: #6ee7b7;
+    color: #e2e8f0;
+  }
+  .checkbox-label:has(input:checked) {
+    border-color: #6ee7b7;
+    background: rgba(110, 231, 183, 0.08);
+    color: #6ee7b7;
+  }
 </style>
-</head>
-<body>
-
-<!-- Sidebar -->
-<aside class="sidebar">
-  <div class="logo">Search<span>Kit</span></div>
-  <div class="logo-sub">Admin Dashboard</div>
-  <nav>
-    <button class="nav-item active" onclick="showPage('stats')">
-      <span class="nav-icon">◈</span> Overview
-    </button>
-    <button class="nav-item" onclick="showPage('search')">
-      <span class="nav-icon">⌕</span> Search
-    </button>
-    <button class="nav-item" onclick="showPage('docs')">
-      <span class="nav-icon">≡</span> Documents
-    </button>
-    <button class="nav-item" onclick="showPage('logs')">
-      <span class="nav-icon">▸</span> Live Logs
-    </button>
-  </nav>
-  <div class="sidebar-footer">
-    <a href="/admin/logout" class="logout-btn">↩ Sign out</a>
-  </div>
-</aside>
-
-<!-- Main -->
-<main class="main">
-
-  <!-- ── Overview ── -->
-  <div id="page-stats" class="page active">
-    <div class="page-title">Overview <span>·</span> System Health</div>
-
-    <div class="stats-grid" id="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">Collections</div>
-        <div class="stat-value" id="stat-collections">—</div>
-        <div class="stat-sub">total collections</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Total Documents</div>
-        <div class="stat-value" id="stat-docs">—</div>
-        <div class="stat-sub">across all collections</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">RAM Usage</div>
-        <div class="stat-value" id="stat-mem">—</div>
-        <div class="stat-sub" id="stat-mem-sub">of limit</div>
-        <div class="mem-bar-wrap"><div class="mem-bar" id="mem-bar" style="width:0%"></div></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Collections</div>
-      <table class="table">
-        <thead>
-          <tr><th>Name</th><th>Documents</th><th>Status</th></tr>
-        </thead>
-        <tbody id="collections-table">
-          <tr><td colspan="3" class="empty">Loading…</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ── Search ── -->
-  <div id="page-search" class="page">
-    <div class="page-title">Search <span>·</span> Test Queries</div>
-    <div class="card">
-      <div class="form-row">
-        <div class="form-group" style="flex:3">
-          <label>Query</label>
-          <input type="text" id="search-query" placeholder="Enter your search query…" onkeydown="if(event.key==='Enter') runSearch()">
-        </div>
-        <div class="form-group" style="flex:1; min-width:120px">
-          <label>Collection</label>
-          <select id="search-collection"></select>
-        </div>
-        <div class="form-group" style="flex:0; min-width:80px">
-          <label>Top K</label>
-          <input type="number" id="search-topk" value="10" min="1" max="100">
-        </div>
-      </div>
-      <button class="btn btn-primary" onclick="runSearch()">Search →</button>
-    </div>
-    <div id="search-results"></div>
-  </div>
-
-  <!-- ── Documents ── -->
-  <div id="page-docs" class="page">
-    <div class="page-title">Documents <span>·</span> Browser</div>
-    <div class="card">
-      <div class="card-title">Browse</div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Collection</label>
-          <select id="docs-collection" onchange="loadDocs()"></select>
-        </div>
-        <div class="form-group" style="flex:0; min-width:100px">
-          <label>Limit</label>
-          <input type="number" id="docs-limit" value="50" min="1" max="500" onchange="loadDocs()">
-        </div>
-        <div class="form-group" style="flex:0; display:flex; align-items:flex-end;">
-          <button class="btn btn-primary" onclick="loadDocs()">Load</button>
-        </div>
-      </div>
-      <div id="docs-list"><div class="empty">Select a collection and click Load.</div></div>
-    </div>
-  </div>
-
-  <!-- ── Logs ── -->
-  <div id="page-logs" class="page">
-    <div class="page-title">Live Logs <span>·</span> Last 200 lines</div>
-    <div class="card">
-      <div class="log-controls">
-        <div class="log-filter">
-          <button class="filter-btn active" onclick="setFilter('ALL', this)">ALL</button>
-          <button class="filter-btn" onclick="setFilter('INFO', this)">INFO</button>
-          <button class="filter-btn" onclick="setFilter('WARNING', this)">WARN</button>
-          <button class="filter-btn" onclick="setFilter('ERROR', this)">ERROR</button>
-          <button class="filter-btn" onclick="setFilter('DEBUG', this)">DEBUG</button>
-        </div>
-        <div class="auto-refresh"><div class="dot"></div> Auto-refresh 3s</div>
-      </div>
-      <div class="log-wrap" id="log-wrap"></div>
-    </div>
-  </div>
-
-</main>
 
 <script>
-// ── State ──────────────────────────────────────────────────
-let currentPage   = 'stats';
-let logFilter     = 'ALL';
-let collections   = [];
-let statsInterval = null;
-let logsInterval  = null;
+  const PAGES = ["stats", "search", "docs", "collections", "import", "logs"];
+  let logFilter = "ALL",
+    allLogs = [],
+    sseSource = null,
+    autoScroll = true;
+  let csvFile = null,
+    csvColumns = [],
+    csvPreviewData = [];
 
-// ── Navigation ─────────────────────────────────────────────
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  document.querySelectorAll('.nav-item')[['stats','search','docs','logs'].indexOf(name)].classList.add('active');
-  currentPage = name;
-  if (name === 'logs')  startLogsRefresh();
-  else                  stopLogsRefresh();
-}
-
-// ── Toast ──────────────────────────────────────────────────
-function toast(msg, type = 'success') {
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 3000);
-}
-
-// ── API helpers ────────────────────────────────────────────
-async function api(path, opts = {}) {
-  const res = await fetch('/admin' + path, {
-    headers: { 'Content-Type': 'application/json' },
-    ...opts,
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-// ── Stats ──────────────────────────────────────────────────
-async function loadStats() {
-  try {
-    const data = await api('/api/stats');
-    collections = data.collections;
-
-    // Update stat cards
-    document.getElementById('stat-collections').textContent = data.collections.length;
-    const totalDocs = data.collections.reduce((s, c) => s + c.count, 0);
-    document.getElementById('stat-docs').textContent = totalDocs.toLocaleString();
-    document.getElementById('stat-mem').textContent  = data.memory_mb + ' MB';
-    document.getElementById('stat-mem-sub').textContent = `of ${data.memory_limit_mb} MB limit`;
-
-    // Memory bar
-    const pct  = Math.min((data.memory_mb / data.memory_limit_mb) * 100, 100);
-    const bar  = document.getElementById('mem-bar');
-    bar.style.width = pct + '%';
-    bar.className   = 'mem-bar' + (pct >= 90 ? ' crit' : pct >= 75 ? ' warn' : '');
-
-    // Collections table
-    const tbody = document.getElementById('collections-table');
-    if (data.collections.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="3" class="empty">No collections yet.</td></tr>';
-    } else {
-      tbody.innerHTML = data.collections.map(c => `
-        <tr>
-          <td>${c.name}</td>
-          <td><span class="badge">${c.count.toLocaleString()} docs</span></td>
-          <td><span style="color:var(--success);font-size:0.75rem;">● active</span></td>
-        </tr>
-      `).join('');
-    }
-
-    // Populate collection selects
-    populateCollectionSelects(data.collections.map(c => c.name));
-  } catch (e) {
-    console.error('Stats error:', e);
+  // ── Navigation ─────────────────────────────────────────────
+  function showPage(name) {
+    PAGES.forEach((p) =>
+      document
+        .getElementById("page-" + p)
+        .classList.toggle("hidden", p !== name),
+    );
+    document
+      .querySelectorAll(".nav-item")
+      .forEach((n, i) => n.classList.toggle("active", PAGES[i] === name));
+    if (name === "logs") connectSSE();
+    else disconnectSSE();
   }
-}
 
-function populateCollectionSelects(names) {
-  ['search-collection', 'docs-collection'].forEach(id => {
-    const sel = document.getElementById(id);
-    const cur = sel.value;
-    sel.innerHTML = names.map(n => `<option value="${n}">${n}</option>`).join('');
-    if (cur && names.includes(cur)) sel.value = cur;
-  });
-}
+  // ── API key ────────────────────────────────────────────────
+  const API_KEY = () => localStorage.getItem("sk_api_key") || "";
 
-// ── Search ─────────────────────────────────────────────────
-async function runSearch() {
-  const query      = document.getElementById('search-query').value.trim();
-  const collection = document.getElementById('search-collection').value;
-  const top_k      = parseInt(document.getElementById('search-topk').value);
-  const container  = document.getElementById('search-results');
+  function saveApiKey(val) {
+    localStorage.setItem("sk_api_key", val);
+  }
 
-  if (!query) return;
-  container.innerHTML = '<div class="loading">Searching…</div>';
+  async function api(path, opts = {}) {
+    const isAdmin = path.startsWith("/api/") || path.startsWith("/admin/api/");
+    const url = isAdmin ? "/admin" + path : path;
+    const headers = {
+      "Content-Type": "application/json",
+      ...(isAdmin ? {} : { "X-API-Key": API_KEY() }),
+    };
+    const res = await fetch(url, { headers, ...opts });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  }
 
-  try {
-    const data = await api('/api/search', {
-      method: 'POST',
-      body: JSON.stringify({ query, collection, top_k }),
+  // ── Toggle insert form ─────────────────────────────────────
+  function toggleInsertForm() {
+    const panel = document.getElementById("insert-form-panel");
+    const btn = document.getElementById("insert-toggle-btn");
+    const hidden = panel.classList.toggle("hidden");
+    btn.textContent = hidden ? "＋ Insert Document" : "✕ Close";
+  }
+
+  // ── Stats ──────────────────────────────────────────────────
+  async function loadStats() {
+    try {
+      const data = await api("/api/stats");
+      document.getElementById("stat-collections").textContent =
+        data.collections.length;
+      const total = data.collections.reduce((s, c) => s + c.count, 0);
+      document.getElementById("stat-docs").textContent = total.toLocaleString();
+      document.getElementById("stat-mem").textContent = data.memory_mb + " MB";
+      document.getElementById("stat-mem-sub").textContent =
+        `of ${data.memory_limit_mb} MB limit`;
+      const pct = Math.min((data.memory_mb / data.memory_limit_mb) * 100, 100);
+      const bar = document.getElementById("mem-bar");
+      bar.style.width = pct + "%";
+      bar.className =
+        "h-full rounded-full transition-all duration-500 " +
+        (pct >= 90 ? "bg-red-400" : pct >= 75 ? "bg-yellow-400" : "bg-brand");
+      document.getElementById("collections-table").innerHTML = data.collections
+        .length
+        ? data.collections
+            .map(
+              (c) =>
+                `<tr class="border-b border-border/50 hover:bg-white/[0.02]"><td class="px-2 py-2.5">${escHtml(c.name)}</td><td class="px-2 py-2.5"><span class="bg-brand/10 text-brand text-xs px-2 py-0.5 rounded">${c.count.toLocaleString()} docs</span></td><td class="px-2 py-2.5 text-green-400 text-xs">● active</td></tr>`,
+            )
+            .join("")
+        : '<tr><td colspan="3" class="text-center text-slate-500 py-8">No collections yet.</td></tr>';
+      populateSelects(data.collections.map((c) => c.name));
+      renderCollectionsManage(data.collections);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function populateSelects(names) {
+    [
+      "search-collection",
+      "docs-collection",
+      "insert-doc-collection",
+      "import-collection",
+    ].forEach((id) => {
+      const sel = document.getElementById(id);
+      const cur = sel.value;
+      sel.innerHTML = names
+        .map((n) => `<option value="${escHtml(n)}">${escHtml(n)}</option>`)
+        .join("");
+      if (cur && names.includes(cur)) sel.value = cur;
     });
+  }
 
-    if (!data.results.length) {
-      container.innerHTML = '<div class="empty">No results found.</div>';
+  // ── Collections ────────────────────────────────────────────
+  function renderCollectionsManage(collections) {
+    const el = document.getElementById("collections-manage-list");
+    el.innerHTML = collections.length
+      ? collections
+          .map(
+            (c) => `
+        <div class="flex items-center justify-between py-3 border-b border-border/50 last:border-0">
+          <div>
+            <p class="text-sm text-slate-200">${escHtml(c.name)}</p>
+            <p class="text-xs text-slate-500">${c.count.toLocaleString()} documents</p>
+          </div>
+          <button onclick="dropCollection('${escAttr(c.name)}')"
+            class="px-3 py-1.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs rounded-lg hover:bg-red-500/20 transition-colors font-display font-bold">
+            Drop
+          </button>
+        </div>`,
+          )
+          .join("")
+      : '<p class="text-slate-500 text-sm text-center py-8">No collections yet.</p>';
+  }
+
+  async function createCollection() {
+    const name = document.getElementById("new-collection-name").value.trim();
+    if (!name) return;
+    try {
+      await api("/collections", {
+        method: "POST",
+        body: JSON.stringify({ name }),
+      });
+      document.getElementById("new-collection-name").value = "";
+      toast(`Collection '${name}' created`);
+      loadStats();
+    } catch (e) {
+      toast(`Failed: ${e.message}`, "error");
+    }
+  }
+
+  async function dropCollection(name) {
+    if (
+      !confirm(
+        `Drop collection "${name}" and all its documents? This cannot be undone.`,
+      )
+    )
+      return;
+    try {
+      await api(`/collections/${encodeURIComponent(name)}`, {
+        method: "DELETE",
+      });
+      toast(`Collection '${name}' dropped`);
+      loadStats();
+    } catch (e) {
+      toast(`Failed: ${e.message}`, "error");
+    }
+  }
+
+  // ── Search ─────────────────────────────────────────────────
+  async function runSearch() {
+    const query = document.getElementById("search-query").value.trim();
+    const collection = document.getElementById("search-collection").value;
+    const top_k = parseInt(document.getElementById("search-topk").value);
+    const container = document.getElementById("search-results");
+    if (!query) return;
+    container.innerHTML =
+      '<p class="text-slate-500 text-sm py-2">Searching…</p>';
+    try {
+      const data = await api("/search", {
+        method: "POST",
+        body: JSON.stringify({ query, collection, top_k }),
+      });
+      container.innerHTML = data.results.length
+        ? data.results
+            .map(
+              (r) => `
+          <div class="bg-[#16161f] border border-border rounded-lg p-4 mb-2">
+            <div class="flex justify-between items-center mb-1.5">
+              <span class="text-indigo-400 text-xs"># ${escHtml(r.id)}</span>
+              <span class="text-slate-500 text-xs">distance: ${r.distance}</span>
+            </div>
+            <p class="text-slate-200 text-sm leading-relaxed mb-1">${escHtml(r.text)}</p>
+            <p class="text-slate-500 text-xs italic">${Object.keys(r.metadata).length ? escHtml(JSON.stringify(r.metadata)) : "no metadata"}</p>
+          </div>`,
+            )
+            .join("")
+        : '<p class="text-slate-500 text-sm text-center py-8">No results found.</p>';
+    } catch (e) {
+      container.innerHTML = `<p class="text-red-400 text-sm py-2">Error: ${escHtml(e.message)}</p>`;
+    }
+  }
+
+  // ── Documents ──────────────────────────────────────────────
+  async function loadDocs() {
+    const collection = document.getElementById("docs-collection").value;
+    const limit = document.getElementById("docs-limit").value;
+    const container = document.getElementById("docs-list");
+    if (!collection) return;
+    container.innerHTML = '<p class="text-slate-500 text-sm py-2">Loading…</p>';
+    try {
+      const data = await api(
+        `/admin/api/documents/browse?collection=${collection}&limit=${limit}`,
+      );
+      container.innerHTML = data.documents.length
+        ? `<p class="text-slate-500 text-xs mb-3">Showing ${data.documents.length} of ${data.total.toLocaleString()}</p>` +
+          data.documents
+            .map(
+              (d) => `
+          <div id="doc-${escAttr(d.id)}" class="bg-[#16161f] border border-border rounded-lg p-3.5 mb-2 flex gap-3 items-start">
+            <div class="flex-1 overflow-hidden">
+              <p class="text-indigo-400 text-xs mb-1">${escHtml(d.id)}</p>
+              <p class="text-slate-200 text-sm truncate">${escHtml(d.text)}</p>
+              <p class="text-slate-500 text-xs mt-1 italic">${Object.keys(d.metadata).length ? escHtml(JSON.stringify(d.metadata)) : "no metadata"}</p>
+            </div>
+            <button onclick="deleteDoc('${escAttr(d.id)}','${escAttr(collection)}')"
+              class="shrink-0 px-3 py-1.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs rounded-lg hover:bg-red-500/20 transition-colors font-display font-bold">
+              Delete
+            </button>
+          </div>`,
+            )
+            .join("")
+        : '<p class="text-slate-500 text-sm text-center py-8">No documents in this collection.</p>';
+    } catch (e) {
+      container.innerHTML = `<p class="text-red-400 text-sm py-2">Error: ${escHtml(e.message)}</p>`;
+    }
+  }
+
+  async function deleteDoc(id, collection) {
+    if (!confirm(`Delete "${id}"?`)) return;
+    try {
+      await api("/documents/delete", {
+        method: "DELETE",
+        body: JSON.stringify({ ids: [id], collection }),
+      });
+      document.getElementById("doc-" + id)?.remove();
+      toast(`Deleted "${id}"`);
+      loadStats();
+    } catch (e) {
+      toast(`Failed: ${e.message}`, "error");
+    }
+  }
+
+  async function insertDocument() {
+    const id = document.getElementById("insert-id").value.trim();
+    const text = document.getElementById("insert-text").value.trim();
+    const collection = document.getElementById("insert-doc-collection").value;
+    const metaRaw = document.getElementById("insert-meta").value.trim();
+    const status = document.getElementById("insert-status");
+    if (!id || !text) {
+      toast("ID and Text are required", "error");
       return;
     }
-
-    container.innerHTML = data.results.map((r, i) => `
-      <div class="result-item">
-        <div class="result-header">
-          <span class="result-id"># ${r.id}</span>
-          <span class="result-score">distance: ${r.distance}</span>
-        </div>
-        <div class="result-text">${escHtml(r.text)}</div>
-        <div class="result-meta">${Object.keys(r.metadata).length ? JSON.stringify(r.metadata) : 'no metadata'}</div>
-      </div>
-    `).join('');
-  } catch (e) {
-    container.innerHTML = `<div class="empty" style="color:var(--danger)">Error: ${e.message}</div>`;
+    let metadata = {};
+    if (metaRaw) {
+      try {
+        metadata = JSON.parse(metaRaw);
+      } catch (e) {
+        toast("Invalid JSON in metadata", "error");
+        return;
+      }
+    }
+    try {
+      const data = await api("/documents/upsert", {
+        method: "POST",
+        body: JSON.stringify({ id, text, collection, metadata }),
+      });
+      status.textContent = `✓ ${data.message}`;
+      status.className = "text-sm text-brand";
+      document.getElementById("insert-id").value = "";
+      document.getElementById("insert-text").value = "";
+      document.getElementById("insert-meta").value = "";
+      loadStats();
+    } catch (e) {
+      status.textContent = `✗ ${e.message}`;
+      status.className = "text-sm text-red-400";
+    }
   }
-}
 
-// ── Documents ──────────────────────────────────────────────
-async function loadDocs() {
-  const collection = document.getElementById('docs-collection').value;
-  const limit      = document.getElementById('docs-limit').value;
-  const container  = document.getElementById('docs-list');
-  if (!collection) return;
+  // ── CSV Import ─────────────────────────────────────────────
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById("drop-zone").classList.remove("border-brand");
+    if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
+  }
+  function handleFileSelect(input) {
+    if (input.files[0]) processFile(input.files[0]);
+  }
 
-  container.innerHTML = '<div class="loading">Loading documents…</div>';
-  try {
-    const data = await api(`/api/documents?collection=${collection}&limit=${limit}`);
+  async function processFile(file) {
+    csvFile = file;
+    const form = new FormData();
+    form.append("file", file);
+    try {
+      const res = await fetch("/admin/api/csv/preview", {
+        method: "POST",
+        body: form,
+      });
+      const data = await res.json();
+      csvColumns = data.columns;
+      csvPreviewData = data.preview;
+      showCsvStep2();
+    } catch (e) {
+      toast(`Failed to read CSV: ${e.message}`, "error");
+    }
+  }
 
-    if (!data.documents.length) {
-      container.innerHTML = '<div class="empty">No documents in this collection.</div>';
+  function showCsvStep2() {
+    document.getElementById("import-step2").classList.remove("hidden");
+    if (csvPreviewData.length) {
+      const headers = csvColumns
+        .map(
+          (c) =>
+            `<th class="px-2 py-1 text-left text-brand whitespace-nowrap">${escHtml(c)}</th>`,
+        )
+        .join("");
+      const rows = csvPreviewData
+        .map(
+          (r) =>
+            `<tr class="border-t border-border/40">${csvColumns.map((c) => `<td class="px-2 py-1 text-slate-400 max-w-[200px] truncate" title="${escHtml(String(r[c] || ""))}">${escHtml(String(r[c] || ""))}</td>`).join("")}</tr>`,
+        )
+        .join("");
+      document.getElementById("csv-preview").innerHTML =
+        `<table class="w-full border border-border rounded overflow-hidden"><thead class="bg-border/40"><tr>${headers}</tr></thead><tbody>${rows}</tbody></table>`;
+    }
+    document.getElementById("import-id-field").innerHTML = csvColumns
+      .map((c) => `<option value="${escHtml(c)}">${escHtml(c)}</option>`)
+      .join("");
+    document.getElementById("text-field-checkboxes").innerHTML = csvColumns
+      .map(
+        (c) => `
+    <label class="checkbox-label">
+      <input type="checkbox" value="${escHtml(c)}" class="sr-only">
+      <span>${escHtml(c)}</span>
+    </label>`,
+      )
+      .join("");
+  }
+
+  async function startImport() {
+    const collection = document.getElementById("import-collection").value;
+    const id_field = document.getElementById("import-id-field").value;
+    const batch_size = document.getElementById("import-batch-size").value;
+    const checked = [
+      ...document.querySelectorAll("#text-field-checkboxes input:checked"),
+    ].map((i) => i.value);
+    if (!checked.length) {
+      toast("Select at least one text field", "error");
       return;
     }
-
-    container.innerHTML = `<div style="color:var(--muted);font-size:0.75rem;margin-bottom:0.75rem;">
-      Showing ${data.documents.length} of ${data.total.toLocaleString()} documents
-    </div>` + data.documents.map(d => `
-      <div class="doc-item" id="doc-${d.id}">
-        <div class="doc-body">
-          <div class="doc-id">${escHtml(d.id)}</div>
-          <div class="doc-text">${escHtml(d.text)}</div>
-          <div class="doc-meta">${Object.keys(d.metadata).length ? JSON.stringify(d.metadata) : 'no metadata'}</div>
-        </div>
-        <button class="btn btn-danger btn-sm" onclick="deleteDoc('${escAttr(d.id)}', '${escAttr(collection)}')">Delete</button>
-      </div>
-    `).join('');
-  } catch (e) {
-    container.innerHTML = `<div class="empty" style="color:var(--danger)">Error: ${e.message}</div>`;
+    document.getElementById("import-step3").classList.remove("hidden");
+    document.getElementById("import-step2").classList.add("hidden");
+    const form = new FormData();
+    form.append("file", csvFile);
+    form.append("collection", collection);
+    form.append("id_field", id_field);
+    form.append("text_fields", checked.join(","));
+    form.append("batch_size", batch_size);
+    const res = await fetch("/admin/api/csv/import", {
+      method: "POST",
+      body: form,
+    });
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      for (const line of decoder
+        .decode(value)
+        .split("\n")
+        .filter((l) => l.startsWith("data:"))) {
+        try {
+          const ev = JSON.parse(line.slice(5));
+          if (ev.type === "progress") {
+            document.getElementById("import-progress-bar").style.width =
+              ev.progress + "%";
+            document.getElementById("import-progress-pct").textContent =
+              ev.progress + "%";
+            document.getElementById("import-progress-label").textContent =
+              `Imported ${ev.imported} rows…`;
+          } else if (ev.type === "done") {
+            document.getElementById("import-progress-bar").style.width = "100%";
+            document.getElementById("import-progress-pct").textContent = "100%";
+            document.getElementById("import-progress-label").textContent =
+              "Complete!";
+            document.getElementById("import-result").innerHTML = `
+            <p class="text-brand">✓ Import complete</p>
+            <p class="text-slate-500 mt-1">Imported: <span class="text-slate-200">${ev.imported}</span> &nbsp; Skipped: <span class="text-slate-200">${ev.skipped}</span> &nbsp; Total: <span class="text-slate-200">${ev.total}</span></p>
+            <button onclick="resetImport()" class="btn-primary mt-4 text-sm">Import Another</button>`;
+            loadStats();
+          }
+        } catch (_) {}
+      }
+    }
   }
-}
 
-async function deleteDoc(id, collection) {
-  if (!confirm(`Delete document "${id}"?`)) return;
-  try {
-    await api(`/api/documents/${encodeURIComponent(id)}?collection=${collection}`, { method: 'DELETE' });
-    document.getElementById('doc-' + id)?.remove();
-    toast(`Deleted "${id}"`);
-    loadStats();
-  } catch (e) {
-    toast(`Failed: ${e.message}`, 'error');
+  function resetImport() {
+    csvFile = null;
+    csvColumns = [];
+    csvPreviewData = [];
+    ["import-step2", "import-step3"].forEach((id) =>
+      document.getElementById(id).classList.add("hidden"),
+    );
+    document.getElementById("import-progress-bar").style.width = "0%";
+    document.getElementById("import-result").innerHTML = "";
+    document.getElementById("csv-file").value = "";
   }
-}
 
-// ── Logs ───────────────────────────────────────────────────
-function setFilter(level, btn) {
-  logFilter = level;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderLogs(window._lastLogs || []);
-}
+  // ── SSE Logs ──────────────────────────────────────────────
+  const LEVEL_COLORS = {
+    DEBUG: "text-slate-500",
+    INFO: "text-brand",
+    WARNING: "text-yellow-400",
+    ERROR: "text-red-400",
+    CRITICAL: "text-red-400 font-bold",
+  };
 
-async function fetchLogs() {
-  try {
-    const data = await api('/api/logs');
-    window._lastLogs = data.logs;
-    renderLogs(data.logs);
-  } catch (e) { /* silent */ }
-}
-
-function renderLogs(logs) {
-  const filtered = logFilter === 'ALL' ? logs : logs.filter(l => l.level === logFilter);
-  const wrap = document.getElementById('log-wrap');
-  if (!filtered.length) {
-    wrap.innerHTML = '<div class="empty">No log entries.</div>';
-    return;
+  function connectSSE() {
+    if (sseSource) return;
+    sseSource = new EventSource("/admin/api/logs/stream");
+    sseSource.onopen = () => {
+      document.getElementById("sse-dot").className =
+        "inline-block w-2 h-2 rounded-full bg-brand animate-pulse-dot";
+      document.getElementById("sse-label").textContent = "Live";
+    };
+    sseSource.onmessage = (ev) => {
+      const line = JSON.parse(ev.data);
+      allLogs.push(line);
+      if (logFilter === "ALL" || line.level === logFilter) appendLogLine(line);
+    };
+    sseSource.onerror = () => {
+      document.getElementById("sse-dot").className =
+        "inline-block w-2 h-2 rounded-full bg-slate-600";
+      document.getElementById("sse-label").textContent = "Reconnecting…";
+    };
   }
-  wrap.innerHTML = filtered.map(l => `
-    <div class="log-line">
-      <span class="log-ts">${l.ts}</span>
-      <span class="log-lvl ${l.level}">${l.level}</span>
-      <span class="log-name" title="${escHtml(l.logger)}">${escHtml(l.logger.split('.').pop())}</span>
-      <span class="log-msg">${escHtml(l.msg)}</span>
-    </div>
-  `).join('');
-}
+  function disconnectSSE() {
+    if (sseSource) {
+      sseSource.close();
+      sseSource = null;
+    }
+  }
 
-function startLogsRefresh() {
-  fetchLogs();
-  logsInterval = setInterval(fetchLogs, 3000);
-}
+  function appendLogLine(line) {
+    const wrap = document.getElementById("log-wrap");
+    const el = document.createElement("div");
+    el.className = "flex gap-3 py-0.5 border-b border-border/40";
+    el.innerHTML = `
+    <span class="text-slate-600 shrink-0 whitespace-nowrap">${escHtml(line.ts)}</span>
+    <span class="w-16 shrink-0 font-medium ${LEVEL_COLORS[line.level] || "text-slate-400"}">${escHtml(line.level)}</span>
+    <span class="text-indigo-400 shrink-0 max-w-[140px] truncate">${escHtml(line.logger.split(".").pop())}</span>
+    <span class="text-slate-200 flex-1 break-words">${escHtml(line.msg)}</span>`;
+    wrap.appendChild(el);
+    if (autoScroll) wrap.scrollTop = wrap.scrollHeight;
+  }
 
-function stopLogsRefresh() {
-  clearInterval(logsInterval);
-  logsInterval = null;
-}
+  function setFilter(level, btn) {
+    logFilter = level;
+    document
+      .querySelectorAll(".filter-btn")
+      .forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    const wrap = document.getElementById("log-wrap");
+    wrap.innerHTML = "";
+    (level === "ALL"
+      ? allLogs
+      : allLogs.filter((l) => l.level === level)
+    ).forEach(appendLogLine);
+  }
+  function clearLogs() {
+    allLogs = [];
+    document.getElementById("log-wrap").innerHTML = "";
+  }
+  document.getElementById("log-wrap").addEventListener("scroll", function () {
+    autoScroll = this.scrollTop + this.clientHeight >= this.scrollHeight - 20;
+  });
 
-// ── Utils ──────────────────────────────────────────────────
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escAttr(s) { return String(s).replace(/'/g,"\\'"); }
+  // ── Init ───────────────────────────────────────────────────
+  const savedKey = localStorage.getItem("sk_api_key") || "";
+  if (savedKey) document.getElementById("api-key-input").value = savedKey;
 
-// ── Init ───────────────────────────────────────────────────
-loadStats();
-statsInterval = setInterval(loadStats, 10000);
+  loadStats();
+  setInterval(loadStats, 10000);
 </script>
-</body>
-</html>
+{% endblock %}

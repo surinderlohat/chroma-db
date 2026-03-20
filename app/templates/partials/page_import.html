@@ -1,0 +1,77 @@
+{# ── CSV Import page ── #}
+<div id="page-import" class="page hidden">
+  <h2 class="font-display text-2xl font-bold tracking-tight mb-6">CSV Import <span class="text-brand">·</span> Batch</h2>
+
+  <!-- Step 1: Upload -->
+  <div id="import-step1" class="bg-surface border border-border rounded-xl p-5 max-w-2xl mb-4">
+    <p class="text-[11px] text-slate-500 uppercase tracking-widest mb-4">Step 1 — Upload CSV File</p>
+    <div id="drop-zone"
+      ondragover="event.preventDefault(); this.classList.add('border-brand')"
+      ondragleave="this.classList.remove('border-brand')"
+      ondrop="handleDrop(event)"
+      class="border-2 border-dashed border-border rounded-xl p-10 text-center cursor-pointer hover:border-brand transition-colors"
+      onclick="document.getElementById('csv-file').click()">
+      <p class="text-3xl mb-2">⇑</p>
+      <p class="text-slate-300 text-sm font-display font-bold">Drop CSV file here or click to browse</p>
+      <p class="text-slate-600 text-xs mt-1">UTF-8 or Latin-1 encoding supported</p>
+    </div>
+    <input type="file" id="csv-file" accept=".csv" class="hidden" onchange="handleFileSelect(this)">
+  </div>
+
+  <!-- Step 2: Map columns -->
+  <div id="import-step2" class="bg-surface border border-border rounded-xl p-5 max-w-2xl mb-4 hidden">
+    <p class="text-[11px] text-slate-500 uppercase tracking-widest mb-4">Step 2 — Map Columns</p>
+
+    <div class="overflow-x-auto mb-5">
+      <p class="text-xs text-slate-500 mb-2">Preview (first 5 rows):</p>
+      <div id="csv-preview" class="text-xs"></div>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <label class="lbl">Target Collection</label>
+        <select id="import-collection" class="inp"></select>
+      </div>
+      <div>
+        <label class="lbl">ID Field <span class="text-slate-600 normal-case text-xs tracking-normal">— column to use as document ID</span></label>
+        <select id="import-id-field" class="inp"></select>
+      </div>
+      <div>
+        <label class="lbl">Text Fields <span class="text-slate-600 normal-case text-xs tracking-normal">— columns to concatenate for embedding</span></label>
+        <div id="text-field-checkboxes" class="flex flex-wrap gap-2 mt-1"></div>
+        <p class="text-xs text-slate-600 mt-1.5">All selected fields are joined with a space. Everything else becomes metadata.</p>
+      </div>
+      <div>
+        <label class="lbl">Batch Size <span class="text-slate-600 normal-case text-xs tracking-normal">— rows processed per batch</span></label>
+        <select id="import-batch-size" class="inp">
+          <option value="10">10 rows</option>
+          <option value="20">20 rows</option>
+          <option value="50">50 rows</option>
+          <option value="100">100 rows</option>
+          <option value="200" selected>200 rows</option>
+          <option value="500">500 rows</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex gap-3 mt-5">
+      <button onclick="startImport()" class="btn-primary">Start Import →</button>
+      <button onclick="resetImport()" class="px-4 py-2 border border-border text-slate-400 text-sm rounded-lg hover:border-slate-500 transition-colors font-display font-bold">Reset</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Progress -->
+  <div id="import-step3" class="bg-surface border border-border rounded-xl p-5 max-w-2xl hidden">
+    <p class="text-[11px] text-slate-500 uppercase tracking-widest mb-4">Step 3 — Importing…</p>
+    <div class="mb-4">
+      <div class="flex justify-between text-xs text-slate-500 mb-1.5">
+        <span id="import-progress-label">Starting…</span>
+        <span id="import-progress-pct">0%</span>
+      </div>
+      <div class="bg-border rounded-full h-2 overflow-hidden">
+        <div id="import-progress-bar" class="h-full rounded-full bg-brand transition-all duration-300" style="width:0%"></div>
+      </div>
+    </div>
+    <div id="import-result" class="text-sm text-slate-400"></div>
+  </div>
+</div>

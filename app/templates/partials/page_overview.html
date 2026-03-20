@@ -1,0 +1,66 @@
+{# ── Overview page ── #}
+<div id="page-stats" class="page">
+  <h2 class="font-display text-2xl font-bold tracking-tight mb-6">
+    Overview <span class="text-brand">·</span> System Health
+  </h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div class="stat-card before:bg-brand">
+      <p class="text-[11px] text-slate-500 uppercase tracking-widest mb-2">
+        Collections
+      </p>
+      <p
+        id="stat-collections"
+        class="font-display text-4xl font-bold tracking-tight"
+      >
+        —
+      </p>
+      <p class="text-xs text-slate-500 mt-1">total collections</p>
+    </div>
+    <div class="stat-card before:bg-indigo-400">
+      <p class="text-[11px] text-slate-500 uppercase tracking-widest mb-2">
+        Total Documents
+      </p>
+      <p id="stat-docs" class="font-display text-4xl font-bold tracking-tight">
+        —
+      </p>
+      <p class="text-xs text-slate-500 mt-1">across all collections</p>
+    </div>
+    <div class="stat-card before:bg-orange-400">
+      <p class="text-[11px] text-slate-500 uppercase tracking-widest mb-2">
+        RAM Usage
+      </p>
+      <p id="stat-mem" class="font-display text-4xl font-bold tracking-tight">
+        —
+      </p>
+      <p id="stat-mem-sub" class="text-xs text-slate-500 mt-1">of limit</p>
+      <div class="bg-border rounded-full h-1.5 mt-2 overflow-hidden">
+        <div
+          id="mem-bar"
+          class="h-full rounded-full bg-brand transition-all duration-500"
+          style="width: 0%"
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-surface border border-border rounded-xl p-5">
+    <p class="text-[11px] text-slate-500 uppercase tracking-widest mb-4">
+      Collections
+    </p>
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-border">
+          <th class="th">Name</th>
+          <th class="th">Documents</th>
+          <th class="th">Status</th>
+        </tr>
+      </thead>
+      <tbody id="collections-table">
+        <tr>
+          <td colspan="3" class="text-center text-slate-500 py-8">Loading…</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

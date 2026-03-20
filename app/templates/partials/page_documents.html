@@ -1,0 +1,57 @@
+{# ── Documents page (browse + insert) ── #}
+<div id="page-docs" class="page hidden">
+
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="font-display text-2xl font-bold tracking-tight">Documents <span class="text-brand">·</span> Browser</h2>
+    <button onclick="toggleInsertForm()" id="insert-toggle-btn"
+      class="flex items-center gap-2 px-4 py-2 bg-brand/10 border border-brand/30 text-brand text-sm rounded-lg hover:bg-brand/20 transition-colors font-display font-bold">
+      ＋ Insert Document
+    </button>
+  </div>
+
+  <!-- Insert form — toggled via + button -->
+  <div id="insert-form-panel" class="bg-surface border border-border rounded-xl p-5 mb-4 hidden">
+    <p class="text-[11px] text-slate-500 uppercase tracking-widest mb-4">Insert / Update Document</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label class="lbl">Collection</label>
+        <select id="insert-doc-collection" class="inp"></select>
+      </div>
+      <div>
+        <label class="lbl">Document ID</label>
+        <input type="text" id="insert-id" placeholder="e.g. doc_001 or product_123" class="inp">
+      </div>
+    </div>
+    <div class="mb-4">
+      <label class="lbl">Text <span class="text-slate-600 normal-case tracking-normal text-xs">(this gets embedded for search)</span></label>
+      <textarea id="insert-text" rows="3" placeholder="Enter the text content to embed…" class="inp resize-y"></textarea>
+    </div>
+    <div class="mb-4">
+      <label class="lbl">Metadata <span class="text-slate-600 normal-case tracking-normal text-xs">(optional JSON)</span></label>
+      <textarea id="insert-meta" rows="2" placeholder='{"source": "wiki", "category": "ai"}' class="inp resize-y font-mono text-xs"></textarea>
+    </div>
+    <div class="flex gap-3 items-center">
+      <button onclick="insertDocument()" class="btn-primary">Insert →</button>
+      <span id="insert-status" class="text-sm"></span>
+    </div>
+  </div>
+
+  <!-- Browse -->
+  <div class="bg-surface border border-border rounded-xl p-5">
+    <div class="flex gap-3 flex-wrap mb-4 items-end">
+      <div class="flex-1 min-w-40">
+        <label class="lbl">Collection</label>
+        <select id="docs-collection" onchange="loadDocs()" class="inp"></select>
+      </div>
+      <div class="w-24">
+        <label class="lbl">Limit</label>
+        <input type="number" id="docs-limit" value="50" min="1" max="500" class="inp">
+      </div>
+      <button onclick="loadDocs()" class="btn-primary">Load</button>
+    </div>
+    <div id="docs-list">
+      <p class="text-slate-500 text-sm text-center py-8">Select a collection and click Load.</p>
+    </div>
+  </div>
+
+</div>

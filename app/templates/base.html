@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}SearchKit{% endblock %} — Admin</title>
+
+<!-- Tailwind CDN with dark mode -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          brand: {
+            DEFAULT: '#6ee7b7',
+            dim:     'rgba(110,231,183,0.08)',
+          },
+          surface: {
+            DEFAULT: '#12121a',
+            2:       '#16161f',
+          },
+          border: '#1e1e2e',
+        },
+        fontFamily: {
+          mono:    ['"DM Mono"', 'monospace'],
+          display: ['"Syne"', 'sans-serif'],
+        },
+      }
+    }
+  }
+</script>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  body { font-family: 'DM Mono', monospace; }
+  h1, h2, button.display { font-family: 'Syne', sans-serif; }
+  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
+  @keyframes fade-in   { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes slide-up  { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .animate-pulse-dot { animation: pulse-dot 2s infinite; }
+  .animate-fade-in   { animation: fade-in 0.2s ease; }
+  .animate-slide-up  { animation: slide-up 0.3s ease; }
+</style>
+
+{% block head %}{% endblock %}
+</head>
+<body class="bg-[#0a0a0f] text-slate-200 min-h-screen">
+{% block body %}{% endblock %}
+
+<script>
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  const colors = type === 'success'
+    ? 'bg-green-500/10 border border-green-500/30 text-green-400'
+    : 'bg-red-500/10 border border-red-500/30 text-red-400';
+  el.className = `fixed bottom-6 right-6 px-4 py-2.5 rounded-lg text-sm animate-slide-up z-50 ${colors}`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) { return String(s).replace(/'/g,"\\'"); }
+async function api(path, opts = {}) {
+  const res = await fetch('/admin' + path, { headers: {'Content-Type':'application/json'}, ...opts });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,23 @@
+{# ── Collections page ── #}
+<div id="page-collections" class="page hidden">
+  <h2 class="font-display text-2xl font-bold tracking-tight mb-6">Collections <span class="text-brand">·</span> Manage</h2>
+
+  <!-- Create -->
+  <div class="bg-surface border border-border rounded-xl p-5 max-w-2xl mb-6">
+    <p class="text-[11px] text-slate-500 uppercase tracking-widest mb-4">Create New Collection</p>
+    <div class="flex gap-3">
+      <input type="text" id="new-collection-name" placeholder="collection-name" class="inp flex-1"
+        onkeydown="if(event.key==='Enter') createCollection()">
+      <button onclick="createCollection()" class="btn-primary shrink-0">Create</button>
+    </div>
+    <p class="text-xs text-slate-600 mt-2">Use lowercase letters, numbers and hyphens only.</p>
+  </div>
+
+  <!-- List -->
+  <div class="bg-surface border border-border rounded-xl p-5">
+    <p class="text-[11px] text-slate-500 uppercase tracking-widest mb-4">All Collections</p>
+    <div id="collections-manage-list">
+      <p class="text-slate-500 text-sm text-center py-8">Loading…</p>
+    </div>
+  </div>
+</div>
