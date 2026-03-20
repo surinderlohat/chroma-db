@@ -1,5 +1,4 @@
 services:
-
   # ── Single service: FastAPI + embedded ChromaDB ────────
   chroma-wrapper:
     build: .
@@ -12,7 +11,7 @@ services:
       - EMBEDDING_MODEL=BAAI/bge-small-en-v1.5
       - DEFAULT_COLLECTION=default
     volumes:
-      - chroma-data:/app/chromadb   # persist vector data across restarts
+      - chroma-data:/app/chromadb # persist vector data across restarts
 
 volumes:
   chroma-data:
