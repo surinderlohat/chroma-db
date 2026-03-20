@@ -72,9 +72,7 @@ def get_client() -> chromadb.PersistentClient:
 def get_embedding_fn() -> SentenceTransformerEmbeddingFunction:
     global _EMBEDDING_FN
     if _EMBEDDING_FN is None:
-        logger.info(
-            f"Loading embedding model '{MODEL_NAME}' on device '{EMBEDDING_DEVICE}'..."
-        )
+        logger.info(f"Loading embedding model '{MODEL_NAME}' on device '{EMBEDDING_DEVICE}'...")
         _EMBEDDING_FN = SentenceTransformerEmbeddingFunction(
             model_name=MODEL_NAME,
             device=EMBEDDING_DEVICE,

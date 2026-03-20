@@ -15,7 +15,7 @@ BATCH_SIZE = 256
 async def upsert_single(req: SingleUpsertRequest):
     """Insert or update a single document."""
     try:
-        check_memory_limit()   # reject if memory too high
+        check_memory_limit()  # reject if memory too high
         logger.info(f"Upserting document '{req.id}' into collection '{req.collection}'")
         collection = get_collection(req.collection)
         await safe_upsert(
@@ -43,7 +43,7 @@ async def upsert_bulk(req: UpsertRequest):
     total = len(req.documents)
     logger.info(f"Bulk upsert of {total} documents into collection '{req.collection}'")
     try:
-        check_memory_limit()   # reject if memory too high
+        check_memory_limit()  # reject if memory too high
         collection = get_collection(req.collection)
         for i in range(0, total, BATCH_SIZE):
             batch = req.documents[i : i + BATCH_SIZE]

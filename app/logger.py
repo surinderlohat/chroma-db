@@ -7,8 +7,8 @@ import os
 import sys
 
 # ── Config ─────────────────────────────────────────────────
-LOG_LEVEL  = os.getenv("LOG_LEVEL", "INFO").upper()   # INFO | DEBUG | WARNING | ERROR
-LOG_FORMAT = os.getenv("LOG_FORMAT", "text")          # text | json
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()  # INFO | DEBUG | WARNING | ERROR
+LOG_FORMAT = os.getenv("LOG_FORMAT", "text")  # text | json
 
 
 class _JsonFormatter(logging.Formatter):
@@ -16,17 +16,19 @@ class _JsonFormatter(logging.Formatter):
     Outputs each log record as a single JSON line — ideal for log aggregators
     like Datadog, Loki, CloudWatch, or ELK stack.
     """
+
     def format(self, record: logging.LogRecord) -> str:
         import json
         from datetime import datetime, timezone
+
         payload = {
-            "ts":     datetime.now(timezone.utc).isoformat(),
-            "level":  record.levelname,
+            "ts": datetime.now(timezone.utc).isoformat(),
+            "level": record.levelname,
             "logger": record.name,
-            "msg":    record.getMessage(),
+            "msg": record.getMessage(),
             "module": record.module,
-            "func":   record.funcName,
-            "line":   record.lineno,
+            "func": record.funcName,
+            "line": record.lineno,
         }
         if record.exc_info:
             payload["exc"] = self.formatException(record.exc_info)
@@ -38,12 +40,13 @@ class _TextFormatter(logging.Formatter):
     Human-readable colored output for local development.
     Colors are stripped automatically when output is not a TTY (e.g. Docker logs).
     """
+
     COLORS = {
-        "DEBUG":    "\033[36m",   # cyan
-        "INFO":     "\033[32m",   # green
-        "WARNING":  "\033[33m",   # yellow
-        "ERROR":    "\033[31m",   # red
-        "CRITICAL": "\033[35m",   # magenta
+        "DEBUG": "\033[36m",  # cyan
+        "INFO": "\033[32m",  # green
+        "WARNING": "\033[33m",  # yellow
+        "ERROR": "\033[31m",  # red
+        "CRITICAL": "\033[35m",  # magenta
     }
     RESET = "\033[0m"
 

@@ -1,7 +1,6 @@
 # Ruff configuration
 # Docs: https://docs.astral.sh/ruff/configuration/
 
-[tool.ruff]
 target-version = "py311"
 line-length    = 100
 indent-width   = 4
@@ -18,7 +17,7 @@ exclude = [
 ]
 
 # ── Linter ─────────────────────────────────────────────────
-[tool.ruff.lint]
+[lint]
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
@@ -39,17 +38,17 @@ ignore = [
 ]
 
 # Allow unused imports in __init__.py files
-[tool.ruff.lint.per-file-ignores]
+[lint.per-file-ignores]
 "__init__.py" = ["F401"]
 
 # ── Import sorting ─────────────────────────────────────────
-[tool.ruff.lint.isort]
-known-first-party  = ["app"]   # treat app.* as first-party imports
+[lint.isort]
+known-first-party       = ["app"]
 split-on-trailing-comma = true
 
 # ── Formatter ──────────────────────────────────────────────
-[tool.ruff.format]
-quote-style            = "double"   # use double quotes
-indent-style           = "space"
+[format]
+quote-style               = "double"
+indent-style              = "space"
 skip-magic-trailing-comma = false
-line-ending            = "auto"
+line-ending               = "auto"

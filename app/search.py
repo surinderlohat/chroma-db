@@ -12,9 +12,7 @@ router = APIRouter()
 @router.post("", response_model=SearchResponse)
 def semantic_search(req: SearchRequest):
     """Search for semantically similar documents using natural language query."""
-    logger.info(
-        f"Search query='{req.query}' top_k={req.top_k} collection='{req.collection}'"
-    )
+    logger.info(f"Search query='{req.query}' top_k={req.top_k} collection='{req.collection}'")
     try:
         collection = get_collection(req.collection)
 
@@ -33,9 +31,7 @@ def semantic_search(req: SearchRequest):
         documents = [
             DocumentResult.from_chroma(
                 id=results["ids"][0][i],
-                document=results["documents"][0][
-                    i
-                ],  # ChromaDB always returns 'document'
+                document=results["documents"][0][i],  # ChromaDB always returns 'document'
                 metadata=results["metadatas"][0][i] if results["metadatas"] else {},
                 distance=results["distances"][0][i],
             )

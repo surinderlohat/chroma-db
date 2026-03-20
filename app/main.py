@@ -37,7 +37,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(health.router,      tags=["Health"])
+app.include_router(health.router, tags=["Health"])
 app.include_router(collections.router, prefix="/collections", tags=["Collections"])
-app.include_router(documents.router,   prefix="/documents",   tags=["Documents"])
-app.include_router(search.router,      prefix="/search",      tags=["Search"])
+app.include_router(documents.router, prefix="/documents", tags=["Documents"])
+app.include_router(search.router, prefix="/search", tags=["Search"])

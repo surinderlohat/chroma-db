@@ -14,22 +14,24 @@ def health_check():
     """Check if the embedded ChromaDB is operational."""
     logger.debug("Health check requested")
     try:
-        collections  = list_collections()
-        usage_mb     = get_memory_mb()
-        status       = "ok"
+        collections = list_collections()
+        usage_mb = get_memory_mb()
+        status = "ok"
 
         if usage_mb >= MEMORY_LIMIT_MB:
             status = "critical"
         elif usage_mb >= MEMORY_WARN_MB:
             status = "warning"
 
-        logger.debug(f"Health check passed. Collections: {len(collections)}, RAM: {usage_mb:.1f} MB")
+        logger.debug(
+            f"Health check passed. Collections: {len(collections)}, RAM: {usage_mb:.1f} MB"
+        )
         return {
-            "status":        status,
-            "chromadb":      "embedded",
-            "collections":   len(collections),
-            "memory_mb":     round(usage_mb, 1),
-            "memory_warn_mb":  MEMORY_WARN_MB,
+            "status": status,
+            "chromadb": "embedded",
+            "collections": len(collections),
+            "memory_mb": round(usage_mb, 1),
+            "memory_warn_mb": MEMORY_WARN_MB,
             "memory_limit_mb": MEMORY_LIMIT_MB,
         }
     except Exception as e:

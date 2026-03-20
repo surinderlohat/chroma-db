@@ -11,7 +11,7 @@ from app.logger import get_logger
 logger = get_logger(__name__)
 
 # Warn when usage crosses this — gives early heads-up before hitting Docker limit
-MEMORY_WARN_MB  = int(os.getenv("MEMORY_WARN_MB",  "3500"))
+MEMORY_WARN_MB = int(os.getenv("MEMORY_WARN_MB", "3500"))
 
 # Refuse write operations above this — protects against OOM kill mid-write
 MEMORY_LIMIT_MB = int(os.getenv("MEMORY_LIMIT_MB", "4000"))
@@ -31,8 +31,7 @@ def check_memory_warn() -> float:
     usage_mb = get_memory_mb()
     if usage_mb >= MEMORY_WARN_MB:
         logger.warning(
-            f"High memory usage: {usage_mb:.1f} MB "
-            f"(warn threshold: {MEMORY_WARN_MB} MB)"
+            f"High memory usage: {usage_mb:.1f} MB (warn threshold: {MEMORY_WARN_MB} MB)"
         )
     else:
         logger.debug(f"Memory usage: {usage_mb:.1f} MB")
