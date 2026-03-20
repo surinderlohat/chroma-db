@@ -16,6 +16,7 @@ services:
       - LOG_FORMAT=text # text | json (use json in prod)
       - MEMORY_WARN_MB=3500 # log warning when RAM exceeds this
       - MEMORY_LIMIT_MB=4000 # refuse writes above this
+      - API_KEY=your-secret-api-key-here # set a strong key for prod, remove for open access
     volumes:
       - ./data/chromadb:/app/chromadb # vector DB — directly on host disk
       - ./data/models:/app/models # model cache — directly on host disk
